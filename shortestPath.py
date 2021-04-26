@@ -7,9 +7,12 @@ from shapely.geometry import Point
 import time
 
 from dijkstras import *
+from Astar import *
 
-start = (42.34,-71.10)
-end =   (42.36,-71.12)
+start = (42.25,-71.05)
+end =   (42.40,-71.2)
+#start = (42.3,-71.1)
+#end =   (42.35,-71.15)
 test = int(input("use default (1 or 0): "))
 if(test == 0):
     s_lat = float(input("enter starting latitude: "))
@@ -30,6 +33,7 @@ south = min(start[0],end[0]) - .02
 east = max(start[1],end[1])  + .02
 west = min(start[1],end[1])  - .02
 
+print("Generating graph:")
 t0 = time.time()
 G = ox.graph_from_bbox(north,south,east,west, network_type='drive')
 
@@ -55,17 +59,30 @@ s_closest = nodes.loc[source_node]
 t_closest = nodes.loc[target_node]
 
 t0 = time.time()
-distances = dijkstra_get_distance(Gc,source_node,target_node)
-path = dijkstra_get_path(Gc,source_node, target_node,distances)
+for i in range (0, 100):
+    distances = dijkstra_get_distance(Gc,source_node,target_node)
+    d_path = dijkstra_get_path(Gc,source_node, target_node,distances)
 t1 = time.time()
-print("time to generate shortest path: ", t1-t0)
-
-fig, ax = ox.plot_graph_route(Gc, path)
+print("average time to generate dijkstra path: ", (t1-t0)/100)
 
 t0 = time.time()
-route = nx.shortest_path(G=Gc, source=source_node, target=target_node, weight='length')
+for i in range (0, 100):
+    distances = a_star_get_distance_euclidean(Gc,source_node,target_node)
+    ae_path = a_star_get_path(Gc,source_node, target_node,distances)
 t1 = time.time()
-print("time for library to find shortest path: ", t1-t0)
+print("average time to generate euclidean astar path: ", (t1-t0)/100)
 
-fig, ax = ox.plot_graph_route(Gc, route)
+t0 = time.time()
+for i in range (0, 100):
+    distances = a_star_get_distance_manhattan(Gc,source_node,target_node)
+    am_path = a_star_get_path(Gc,source_node, target_node,distances)
+t1 = time.time()
+print("average time to generate manhattan astar path: ", (t1-t0)/100)
 
+t0 = time.time()
+for i in range (0,100):
+    route = nx.shortest_path(G=Gc, source=source_node, target=target_node, weight='length')
+t1 = time.time()
+print("average time for library to find shortest path: ", (t1-t0)/100)
+
+fig, ax = ox.plot_graph_routes(Gc, [d_path,ae_path,am_path,route],route_colors = ["red","blue","green","yellow"])

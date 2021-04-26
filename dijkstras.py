@@ -15,6 +15,7 @@ def dijkstra_get_distance(G,source,target):
     marked = {}            #nodes that have been popped
     distance = {source:0} #current distance to each node
     push(heap,(0,source))
+
     while heap:
         (d,v) = pop(heap)
         if v in marked:
