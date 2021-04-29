@@ -74,7 +74,7 @@ def a_star_get_distance_manhattan(G,source,target):
             cost = e[0]['length']
             x1 = G_nodes[u]['x']
             y1 = G_nodes[u]['y']
-            heur_d = abs(y2-y1)+abs(x2-x1)      #for the manhattan
+            heur_d = (abs(y2-y1)+abs(x2-x1))      #for the manhattan, multiply by .7 to guarantee true shortest path
             if(cost == None):
                 continue        #means data for the edge is missing
             dist = d + cost
@@ -96,7 +96,7 @@ def a_star_get_path(G,source,target,distances):
     G_pred = G.pred
     path = []
     v = target
-
+    length = 0
     while v != source:
         path.insert(0,v)
         min = None
@@ -105,8 +105,12 @@ def a_star_get_path(G,source,target,distances):
                 if min == None:
                     min = distances.get(u)
                     v = u
+                    length = length + e[0]['length']
+                    prev = e[0]['length']
                 elif min > distances.get(u):
+                    length = length + e[0]['length'] - prev
+                    prev = e[0]['length']
                     min = distances.get(u)
-                    v = u
+                    v = u            
     path.insert(0,v)
-    return path
+    return (path, length)

@@ -30,10 +30,10 @@ if(test == 0):
 #the +- .02 is to give a little buffer room in case the path needs to take a short detour,
 #without it the path may not be found in the graph (or the wrong path is found)
 #increasing it much more than this significantly slows down loading the graph though
-north = max(start[0],end[0]) + .02
-south = min(start[0],end[0]) - .02
-east = max(start[1],end[1])  + .02
-west = min(start[1],end[1])  - .02
+north = max(start[0],end[0]) + .01
+south = min(start[0],end[0]) - .01
+east = max(start[1],end[1])  + .01
+west = min(start[1],end[1])  - .01
 load = int(input("load from bigBoston.graphml (1 or 0): "))
 if load == 0:
     print("Generating graph:")
@@ -113,28 +113,28 @@ t_closest = nodes.loc[target_node]
 t0 = time.time()
 for i in range (0, 100):
     distances = dijkstra_get_distance(Gc,source_node,target_node)
-    d_path = dijkstra_get_path(Gc,source_node, target_node,distances)
+    d_path, d_len = dijkstra_get_path(Gc,source_node, target_node,distances)
 t1 = time.time()
-print("average time to generate dijkstra path: ", (t1-t0)/100)
+print("average time to generate dijkstra path: ", (t1-t0)/100, ", length = ", d_len)
 
 t0 = time.time()
 for i in range (0, 100):
     distances = a_star_get_distance_euclidean(Gc,source_node,target_node)
-    ae_path = a_star_get_path(Gc,source_node, target_node,distances)
+    ae_path, ae_len = a_star_get_path(Gc,source_node, target_node,distances)
 t1 = time.time()
-print("average time to generate euclidean astar path: ", (t1-t0)/100)
+print("average time to generate euclidean astar path: ", (t1-t0)/100, ", length = ", ae_len)
 
 t0 = time.time()
 for i in range (0, 100):
     distances = a_star_get_distance_manhattan(Gc,source_node,target_node)
-    am_path = a_star_get_path(Gc,source_node, target_node,distances)
+    am_path, am_len = a_star_get_path(Gc,source_node, target_node,distances)
 t1 = time.time()
-print("average time to generate manhattan astar path: ", (t1-t0)/100)
+print("average time to generate manhattan astar path: ", (t1-t0)/100, ", length = ", am_len)
 
 t0 = time.time()
 for i in range (0,100):
     route = nx.shortest_path(G=Gc, source=source_node, target=target_node, weight='length')
 t1 = time.time()
 print("average time for library to find shortest path: ", (t1-t0)/100)
-
+print("manhattan is off by ", am_len-ae_len,"meters, which is ",(am_len-ae_len)/ae_len,"%")
 fig, ax = ox.plot_graph_routes(Gc, [d_path,ae_path,am_path,route],route_colors = ["red","blue","green","yellow"])

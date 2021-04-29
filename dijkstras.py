@@ -46,7 +46,7 @@ def dijkstra_get_path(G,source,target,distances):
     G_pred = G.pred
     path = []
     v = target
-
+    length = 0
     while v != source:
         path.insert(0,v)
         min = None
@@ -55,8 +55,12 @@ def dijkstra_get_path(G,source,target,distances):
                 if min == None:
                     min = distances.get(u)
                     v = u
+                    length = length + e[0]['length']
+                    prev = e[0]['length']
                 elif min > distances.get(u):
+                    length = length + e[0]['length'] - prev
+                    prev = e[0]['length']
                     min = distances.get(u)
                     v = u            
     path.insert(0,v)
-    return path
+    return (path, length)
